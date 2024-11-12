@@ -43,4 +43,4 @@ build/
 
 # Optional debug files
 debug/
-test.txt
+*.txt
