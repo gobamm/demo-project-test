@@ -1,0 +1,26 @@
+# k8s/base/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-project
+  labels:
+    app: demo-project
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-project
+  template:
+    metadata:
+      labels:
+        app: demo-project
+    spec:
+      containers:
+        - name: demo-project
+          image: ghcr.io/gobamm/demo-project:latest  # Replace with the actual image repository and tag
+          ports:
+            - containerPort: 3000
+
+      imagePullSecrets:
+        - name: ghcr-secret  # Referencing the secret created for GHCR access
+

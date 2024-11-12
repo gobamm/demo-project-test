@@ -1,0 +1,7 @@
+# k8s/base/kustomization.yaml
+resources:
+  - deployment.yaml
+  - service.yaml
+
+# Optionally, define name prefixes or suffixes
+namePrefix: base-
