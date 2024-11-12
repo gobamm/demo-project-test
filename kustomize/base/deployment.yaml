@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: demo-project
-          image: ghcr.io/gobamm/demo-project:latest  # Replace with the actual image repository and tag
+          image: ${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}  # Replace with the actual image repository and tag
           ports:
             - containerPort: 3000
 
