@@ -7,6 +7,11 @@ on:
 #  pull_request:
 #    branches: [ "main" ]
 
+
+env:
+    REPO_NAME: ${{ github.repository }}
+    REPO_NAME_ONLY: ${{ github.repository }} # Stores the full repository name      
+
 permissions:
    id-token: write
    contents: read
@@ -17,15 +22,25 @@ jobs:
   build-image:
 
     runs-on: ubuntu-latest
+    environment: Development
 
     steps:
+
+    - name: Extract and Set Repository Name Only
+      run: |
+        echo "REPO_NAME_ONLY=$(echo $REPO_NAME | cut -d'/' -f2)" >> $GITHUB_ENV        
+
+    #Set the image tag with current date and time
+    - name: Set IMAGE_TAG variable
+      id: tag
+      run: echo "IMAGE_TAG=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: |
-        cd src 
-        docker build . --file Dockerfile --tag ghcr.io/gobamm/demo-project:latest
-#        docker build . --file Dockerfile --tag ghcr.io/bcp-dev-team/msc-bcp-register-api:$(date +%s)
-##        docker tag ghcr.io/bcp-dev-team/msc-bcp-register-api:$(date +%s) ghcr.io/bcp-dev-team/msc-bcp-register-api:latest
+        docker build . --file Dockerfile --tag ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }}
+        docker tag ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }} ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:latest
+
 
     # Log in to GitHub Container Registry
     - name: Log in to GitHub Container Registry
@@ -37,12 +52,15 @@ jobs:
 
    # Push the Docker image
     - name: Push Docker image
-      run: docker push ghcr.io/gobamm/demo-project:latest
+      run: |
+       docker push ghcr.io/gobamm/demo-project:latest
+       docker push ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }}
 
 
   deploy:
     needs: build-image
     runs-on: ubuntu-latest
+    environment: Development
 
     steps:
     - uses: actions/checkout@v4
@@ -67,6 +85,12 @@ jobs:
         cluster-name: ${{ vars.CLUSTER_NAME }}
         admin: 'false'
         use-kubelogin: 'true'
+
+    - name: Set Environment Variables
+      run: |
+          echo "IMAGE_REGISTRY=ghcr.io" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
 
     # Runs Kustomize to create manifest files
     - name: Bake deployment
