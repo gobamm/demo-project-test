@@ -1,0 +1,13 @@
+# k8s/overlays/dev/deployment-patch.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-project  # Must match the name in the base deployment.yaml
+spec:
+  replicas: 1  # Reduce replicas for the dev environment  
+  template:
+    spec:
+      containers:
+        - name: demo-project
+          image: ghcr.io/gobamm/demo-project:latest  # Use a development-specific image tag
+
