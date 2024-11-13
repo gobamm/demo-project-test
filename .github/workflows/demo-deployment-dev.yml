@@ -36,10 +36,11 @@ jobs:
       run: echo "IMAGE_TAG=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
     - uses: actions/checkout@v4
+
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }}
-        docker tag ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }} ghcr.io/${{ vars.ORG_NAME }}/${{ env.REPO_NAME_ONLY }}:latest
+        docker build . --file Dockerfile --tag ghcr.io/${{ vars.ORG_NAME }}${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }}
+        docker tag ghcr.io/${{ vars.ORG_NAME }}${{ env.REPO_NAME_ONLY }}:${{ env.IMAGE_TAG }} ghcr.io/${{ vars.ORG_NAME }}${{ env.REPO_NAME_ONLY }}:latest
 
 
     # Log in to GitHub Container Registry
